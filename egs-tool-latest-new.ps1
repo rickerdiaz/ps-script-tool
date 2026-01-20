@@ -2106,6 +2106,16 @@ else
     Break
 }
 #
+# Ensure web.config uses the app-server-specific SQL IP when deploying on Pallas/Pontus.
+if ($ServerToDeployToApp -eq "Pallas")
+{
+    $DataSourceIP="10.1.0.3"
+}
+elseif ($ServerToDeployToApp -eq "Pontus")
+{
+    $DataSourceIP="10.0.0.3"
+}
+#
 #SNAPIN
 #
 #To Test: Invoke-Sqlcmd -Query "SELECT GETDATE() AS TimeOfQuery;" -ServerInstance $ComputerNameServerSql
