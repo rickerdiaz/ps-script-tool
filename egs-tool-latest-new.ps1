@@ -2090,7 +2090,7 @@ if ($ServerToDeployToApp -eq "Pontus") #-and ($DoIIS -eq "1"))
     $PathcmwebNoSemicolon=$Pathcmweb.Substring(0,1)
     $PathDBs ="E:\Database"         #Location of where the Databases files are installed
     $PathBackupApp="E:\Backup\"        #Location of the backup files (temporary)
-    $CertificateThumbprint="496dcbe323eda7d7ee2738acbd6579944ac3e902" #"009b23c709775a01770a1c519e80703789758228"
+    $CertificateThumbprint="42c951f273c5402fd363ac049dde6d149e12d563" #"496dcbe323eda7d7ee2738acbd6579944ac3e902" #"009b23c709775a01770a1c519e80703789758228"
 }
 elseif ($ServerToDeployToApp -eq "Pallas") #-and ($DoIIS -eq "1"))
 {
@@ -2104,7 +2104,7 @@ elseif ($ServerToDeployToApp -eq "Pallas") #-and ($DoIIS -eq "1"))
     $PathcmwebNoSemicolon=$Pathcmweb.Substring(0,1)
     $PathDBs ="E:\Database"         #Location of where the Databases files are installed
     $PathBackupApp="E:\Backup\"        #Location of the backup files (temporary)
-    $CertificateThumbprint="496dcbe323eda7d7ee2738acbd6579944ac3e902" #"009b23c709775a01770a1c519e80703789758228"
+    $CertificateThumbprint="42c951f273c5402fd363ac049dde6d149e12d563" #"496dcbe323eda7d7ee2738acbd6579944ac3e902" #"009b23c709775a01770a1c519e80703789758228"
 }
 else
 {
