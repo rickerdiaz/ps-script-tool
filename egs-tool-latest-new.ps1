@@ -191,7 +191,7 @@ function fctDownloadCmWebAndUnZip
 {
     param( [string]$paramProfileName, [string]$paramPathcmwebRoot, [string]$paramVersion, [string]$paramYear )
     <#
-        $paramProfileName="egs.s31"
+        $paramProfileName="egs.sandro"
     $paramPathcmwebRoot="C:\EgsExchange"
     $paramVersion="v8.2"
     $paramYear="2015"
@@ -1283,8 +1283,7 @@ Function Update-R53ResourceRecordSet
     [Parameter(Mandatory=$False)]$Comment
     )
          
-    #$ZoneEntry = (Get-R53HostedZones -ProfileName $ProfileName) | ? {$_.Name -eq "$($ZoneName)."}
-    $ZoneEntry = (Get-R53HostedZones) | ? {$_.Name -eq "$($ZoneName)."}
+    $ZoneEntry = (Get-R53HostedZones -ProfileName $ProfileName) | ? {$_.Name -eq "$($ZoneName)."}
                         
     If($ZoneEntry)
     {
@@ -1360,7 +1359,7 @@ Function BindWebsite {
         if (!(Test-Path $iisAppName -PathType Container)) {
             $binding =(
                 @{protocol="http";bindingInformation="$($AllUnassigned):80:"+$iisAppNameBinding},
-                @{protocol="https";bindingInformation="$($AllUnassigned):443:"+$iisAppNameBinding;certificateThumbprint=$thumbprint;SslFlags=1})  #$cert.Thumbprint;certificateStoreName='My'
+                @{protocol="https";bindingInformation="$($AllUnassigned):443:"+$iisAppNameBinding;certificateThumbprint=$thumbprint;certificateStoreName="My";SslFlags=1})  #$cert.Thumbprint;certificateStoreName='My'
             New-Item $iisAppName -Type Site –PhysicalPath $directoryPath -Bindings $binding -Force
             Set-ItemProperty -Path $iisAppName -Name "applicationPool" -Value $iisAppPoolName
             Write-Host "`nWEBSITE HAS BEEN SET UP FOR $clientUpperCase" -ForegroundColor Green
@@ -1603,7 +1602,7 @@ Function BindWebsite {
         if(($hasHTTP -eq $false) -or ($hasHTTPS -eq $false)){
             $binding =(
                 @{protocol="http";bindingInformation="$($AllUnassigned):80:"+$iisAppNameBinding},
-                @{protocol="https";bindingInformation="$($AllUnassigned):443:"+$iisAppNameBinding;SslFlags=1})
+                @{protocol="https";bindingInformation="$($AllUnassigned):443:"+$iisAppNameBinding;certificateThumbprint=$thumbprint;certificateStoreName="My";SslFlags=1})
             New-Item $iisAppName -Type Site –PhysicalPath $directoryPath -bindings $binding -Force
             Set-ItemProperty -Path $iisAppName -Name "applicationPool" -Value $iisAppPoolName
             Write-Host "WEBSITE HAS BEEN SET UP FOR $clientUpperCase" -ForegroundColor Green
@@ -1617,8 +1616,8 @@ Function BindWebsite {
     #Check if certificate is already assigned for ip and port number.
     try {
         $cert = "cert:\LocalMachine\MY\"+$thumbprint
-        $assignCert = "IIS:\SslBindings\"+$ip+"!443"
-        $error= Get-Item $cert | New-Item $assignCert -ErrorAction SilentlyContinue
+        $assignCert = "IIS:\SslBindings\"+$ip+"!443!"+$iisAppNameBinding
+        $error= New-Item $assignCert -Thumbprint $thumbprint -SSLFlags 1 -ErrorAction SilentlyContinue
         Write-Host "`nCERTIFICATE HAS BEEN ASSIGNED FOR IP ADDRESS $ip WITH PORT 443" -ForegroundColor Green
     }
     catch {
@@ -1810,7 +1809,7 @@ if (($DoApp -eq "1") -or ($DoIIS -eq "1") -or ($DOSql1 -eq "1") -or ($DOUpdate -
     }
     #Find the profile by testing
     $ProfileNameAWS=""
-    $ProfileNameAWS="egs.s31" 
+    $ProfileNameAWS="egs.sandro" 
     #
     If ($PathcmwebRoot -eq "") 
     {
@@ -2051,7 +2050,7 @@ if ($ServerToDeployToApp -eq "Pontus") #-and ($DoIIS -eq "1"))
     $ComputerNameServerAppInternalHttps="10.0.0.2" 
     $ComputerNameServerAppExternal="78.47.45.29" 
     $ComputerNameServerAppExternalHttps="78.47.45.29" 
-    $ProfileNameAWS="egs.s31"
+    $ProfileNameAWS="egs.sandro"
     $PathcmwebRoot="C:\EgsExchange" #Folder where file exchanged with servers is located
     $Pathcmweb="E:" #\Website\"     #Location of Websites, etc. WHere the \Website is located
     $PathcmwebNoSemicolon=$Pathcmweb.Substring(0,1)
@@ -2065,7 +2064,7 @@ elseif ($ServerToDeployToApp -eq "Pallas") #-and ($DoIIS -eq "1"))
     $ComputerNameServerAppInternalHttps="10.1.0.2" 
     $ComputerNameServerAppExternal="5.161.23.90" 
     $ComputerNameServerAppExternalHttps="5.161.23.90" 
-    $ProfileNameAWS="egs.s31"
+    $ProfileNameAWS="egs.sandro"
     $PathcmwebRoot="C:\EgsExchange" #Folder where file exchanged with servers is located
     $Pathcmweb="E:" #\Website\"     #Location of Websites, etc. WHere the \Website is located
     $PathcmwebNoSemicolon=$Pathcmweb.Substring(0,1)
@@ -2083,7 +2082,7 @@ if ($ServerToDeployToSql -eq "Talos")
 {
     $ComputerNameServerSql="TALOS"  # 116.202.185.46
     $DataSourceIP="10.1.0.3" #$ComputerNameServerSql floating IP: 116.202.185.46
-    $ProfileNameAWS="egs.s31"
+    $ProfileNameAWS="egs.sandro"
     $PathcmwebRoot="C:\EgsExchange" #Folder where file exchanged with servers is located
     #$Pathcmweb="C:" #\Website\"     #Location of Websites, etc. WHere the \Website is located
     #$PathcmwebNoSemicolon=$Pathcmweb.Substring(0,1)
@@ -2094,7 +2093,7 @@ elseif ($ServerToDeployToSql -eq "Typhon")
 {
     $ComputerNameServerSql="TYPHON"  # 116.202.185.46
     $DataSourceIP="10.0.0.3" #$ComputerNameServerSql floating IP: 116.202.185.46
-    $ProfileNameAWS="egs.s31"
+    $ProfileNameAWS="egs.sandro"
     $PathcmwebRoot="C:\EgsExchange" #Folder where file exchanged with servers is located
     #$Pathcmweb="C:" #\Website\"     #Location of Websites, etc. WHere the \Website is located
     #$PathcmwebNoSemicolon=$Pathcmweb.Substring(0,1)
@@ -4055,7 +4054,7 @@ If ($DoRestoreWeb -eq "1")
     $NowString=[string]$NowStringShort.Substring(0,4)+"-"+$NowStringShort.Substring(4,2)+"-"+$NowStringShort.Substring(6,2)
     $NowString="2025-07-13"    
     #
-    & $AwsExeFile s3 ls "s3://egss3/Backup/$ClientName" --recursive --profile egs.s31 | out-file "$PathTempFile\awsfiles.txt"
+    & $AwsExeFile s3 ls "s3://egss3/Backup/$ClientName" --recursive --profile egs.sandro | out-file "$PathTempFile\awsfiles.txt"
     #Read the file that contain the deployment information
     #$strWhere="*$ClientName"+"_Web_B4update*$NowString*.rar"
     
@@ -4089,7 +4088,7 @@ If ($DoRestoreWeb -eq "1")
                 else
                 {
                     Write-Host "Downloading Backup to $LocalPathForBackup..." -ForegroundColor Magenta
-                    & $AwsExeFile s3 cp  "s3://egss3/$BackupPath" "$BackupFilenameRar" --profile egs.s31
+                    & $AwsExeFile s3 cp  "s3://egss3/$BackupPath" "$BackupFilenameRar" --profile egs.sandro
                 }
                 If (!(Test-Path "$BackupFilenameRar"))
                 {
