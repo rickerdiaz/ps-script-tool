@@ -1647,21 +1647,7 @@ Function BindWebsite {
     }
     
 
-    #Check if certificate is already assigned for ip and port number.
-    try {
-        $cert = "cert:\LocalMachine\MY\"+$thumbprint
-        $assignCert = "IIS:\SslBindings\"+$ip+"!443!"+$iisAppNameBinding
-        $error= New-Item $assignCert -Thumbprint $thumbprint -SSLFlags 1 -ErrorAction SilentlyContinue
-        Write-Host "`nCERTIFICATE HAS BEEN ASSIGNED FOR IP ADDRESS $ip WITH PORT 443" -ForegroundColor Green
-    }
-    catch {
-        if($error -like "*Cannot create a file when that file already exists*") {
-            Write-Host "`nCERTIFICATE ALREADY ASSIGNED FOR IP ADDRESS $ip WITH PORT 443" -ForegroundColor Yellow
-        }
-        else {
-            Write-Host "FAILED TO ASSIGN SSL CERTIFICATE. ERROR: $error" -ForegroundColor Red
-        }
-    }
+    #SSL certificate assignment is handled via the HTTPS binding.
 }
 
 Function WebConfigRewrite {
