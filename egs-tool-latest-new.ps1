@@ -1283,8 +1283,7 @@ Function Update-R53ResourceRecordSet
     [Parameter(Mandatory=$False)]$Comment
     )
          
-    #$ZoneEntry = (Get-R53HostedZones -ProfileName $ProfileName) | ? {$_.Name -eq "$($ZoneName)."}
-    $ZoneEntry = (Get-R53HostedZones) | ? {$_.Name -eq "$($ZoneName)."}
+    $ZoneEntry = (Get-R53HostedZones -ProfileName $ProfileName) | ? {$_.Name -eq "$($ZoneName)."}
                         
     If($ZoneEntry)
     {
@@ -1360,7 +1359,7 @@ Function BindWebsite {
         if (!(Test-Path $iisAppName -PathType Container)) {
             $binding =(
                 @{protocol="http";bindingInformation="$($AllUnassigned):80:"+$iisAppNameBinding},
-                @{protocol="https";bindingInformation="$($AllUnassigned):443:"+$iisAppNameBinding;certificateThumbprint=$thumbprint;SslFlags=1})  #$cert.Thumbprint;certificateStoreName='My'
+                @{protocol="https";bindingInformation="$($AllUnassigned):443:"+$iisAppNameBinding;certificateThumbprint=$thumbprint;certificateStoreName="My";SslFlags=1})  #$cert.Thumbprint;certificateStoreName='My'
             New-Item $iisAppName -Type Site –PhysicalPath $directoryPath -Bindings $binding -Force
             Set-ItemProperty -Path $iisAppName -Name "applicationPool" -Value $iisAppPoolName
             Write-Host "`nWEBSITE HAS BEEN SET UP FOR $clientUpperCase" -ForegroundColor Green
@@ -1603,7 +1602,7 @@ Function BindWebsite {
         if(($hasHTTP -eq $false) -or ($hasHTTPS -eq $false)){
             $binding =(
                 @{protocol="http";bindingInformation="$($AllUnassigned):80:"+$iisAppNameBinding},
-                @{protocol="https";bindingInformation="$($AllUnassigned):443:"+$iisAppNameBinding;SslFlags=1})
+                @{protocol="https";bindingInformation="$($AllUnassigned):443:"+$iisAppNameBinding;certificateThumbprint=$thumbprint;certificateStoreName="My";SslFlags=1})
             New-Item $iisAppName -Type Site –PhysicalPath $directoryPath -bindings $binding -Force
             Set-ItemProperty -Path $iisAppName -Name "applicationPool" -Value $iisAppPoolName
             Write-Host "WEBSITE HAS BEEN SET UP FOR $clientUpperCase" -ForegroundColor Green
@@ -1617,8 +1616,8 @@ Function BindWebsite {
     #Check if certificate is already assigned for ip and port number.
     try {
         $cert = "cert:\LocalMachine\MY\"+$thumbprint
-        $assignCert = "IIS:\SslBindings\"+$ip+"!443"
-        $error= Get-Item $cert | New-Item $assignCert -ErrorAction SilentlyContinue
+        $assignCert = "IIS:\SslBindings\"+$ip+"!443!"+$iisAppNameBinding
+        $error= New-Item $assignCert -Thumbprint $thumbprint -SSLFlags 1 -ErrorAction SilentlyContinue
         Write-Host "`nCERTIFICATE HAS BEEN ASSIGNED FOR IP ADDRESS $ip WITH PORT 443" -ForegroundColor Green
     }
     catch {
@@ -1821,7 +1820,7 @@ if (($DoApp -eq "1") -or ($DoIIS -eq "1") -or ($DOSql1 -eq "1") -or ($DOUpdate -
     If ($ProfileNameAWS -eq "") 
     {
         Write-Host "Cannot find the AWS credentials" -ForegroundColor DarkYellow
-        $ProfileNameAWS="egs.sandro"
+        $ProfileNameAWS="egs.s31"
         Write-Host "Trying with following AWS credentials: $ProfileNameAWS" -ForegroundColor yellow 
         #Break
     }
@@ -2105,6 +2104,16 @@ else
 {
     "SCRIPT INTERRUPTED"
     Break
+}
+#
+# Ensure web.config uses the app-server-specific SQL IP when deploying on Pallas/Pontus.
+if ($ServerToDeployToApp -eq "Pallas")
+{
+    $DataSourceIP="10.1.0.3"
+}
+elseif ($ServerToDeployToApp -eq "Pontus")
+{
+    $DataSourceIP="10.0.0.3"
 }
 #
 #SNAPIN
