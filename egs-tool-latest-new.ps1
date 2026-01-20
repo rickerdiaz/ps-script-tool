@@ -1260,7 +1260,9 @@ Function New-R53ResourceRecordSet
         $CreateRecord.ResourceRecordSet.Name = "$RecordName.$ZoneName"
         $CreateRecord.ResourceRecordSet.Type = $Type
         $CreateRecord.ResourceRecordSet.TTL = $TTL
-        $CreateRecord.ResourceRecordSet.ResourceRecords.Add(@{Value="$Value"})
+        $resourceRecord = New-Object Amazon.Route53.Model.ResourceRecord
+        $resourceRecord.Value = "$Value"
+        $CreateRecord.ResourceRecordSet.ResourceRecords.Add($resourceRecord)
 	    Edit-R53ResourceRecordSet -ProfileName $ProfileName -HostedZoneId $ZoneEntry.Id -ChangeBatch_Change $CreateRecord -ChangeBatch_Comment $Comment
 	}
     Else 
@@ -1293,7 +1295,9 @@ Function Update-R53ResourceRecordSet
         $CreateRecord.ResourceRecordSet.Name = "$RecordName.$ZoneName"
         $CreateRecord.ResourceRecordSet.Type = $Type
         $CreateRecord.ResourceRecordSet.TTL = $TTL
-        $CreateRecord.ResourceRecordSet.ResourceRecords.Add(@{Value="$Value"})
+        $resourceRecord = New-Object Amazon.Route53.Model.ResourceRecord
+        $resourceRecord.Value = "$Value"
+        $CreateRecord.ResourceRecordSet.ResourceRecords.Add($resourceRecord)
         Edit-R53ResourceRecordSet -ProfileName $ProfileName -HostedZoneId $ZoneEntry.Id -ChangeBatch_Change $CreateRecord -ChangeBatch_Comment $Comment
     } 
     Else 
