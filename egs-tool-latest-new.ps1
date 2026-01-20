@@ -1321,13 +1321,8 @@ Function BindWebsite {
     $thumbprint = $CertificateThumbprint
     $thumbprint = $thumbprint -replace '\s',''
     if (-not (Test-Path "Cert:\LocalMachine\My\$thumbprint")) {
-        $matchedCert = Get-ChildItem -Path Cert:\LocalMachine\My |
-            Where-Object { $_.HasPrivateKey -and $_.Subject -like "*$certificate*" } |
-            Sort-Object NotAfter -Descending |
-            Select-Object -First 1
-        if ($matchedCert) {
-            $thumbprint = $matchedCert.Thumbprint
-        }
+        Write-Host "SSL certificate thumbprint $thumbprint not found in LocalMachine\\My. Update CertificateThumbprint after renewal." -ForegroundColor Red
+        break
     }
     
     #foreach($client in $clientAll) {
