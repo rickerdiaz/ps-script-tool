@@ -1328,6 +1328,27 @@ Function BindWebsite {
     $iisAppNameBinding =$AppNameBinding+".calcmenuweb.com"
     $directoryPath = $drivePath+"\Website\"+$client+"\CalcmenuWeb"
 
+    function Set-SslBindingForSite {
+        param(
+            [string]$siteName,
+            [string]$hostName,
+            [string]$thumbprint
+        )
+        $httpsBinding = Get-WebBinding -Name $siteName -Protocol "https" -Port 443 -HostHeader $hostName
+        if ($httpsBinding) {
+            try {
+                $httpsBinding.AddSslCertificate($thumbprint, "MY")
+                Write-Host "`nSSL CERTIFICATE HAS BEEN SET FOR $hostName" -ForegroundColor Green
+            }
+            catch {
+                Write-Host "FAILED TO ASSIGN SSL CERTIFICATE FOR $hostName. ERROR: $($_.Exception.Message)" -ForegroundColor Red
+            }
+        }
+        else {
+            Write-Host "HTTPS BINDING NOT FOUND FOR $hostName" -ForegroundColor Red
+        }
+    }
+
     Set-Location IIS:\AppPools\ # Added 2025-06-29
     CD IIS:\AppPools\
 
@@ -1367,6 +1388,7 @@ Function BindWebsite {
             New-Item $iisAppName -Type Site –PhysicalPath $directoryPath -Bindings $binding -Force
             Set-ItemProperty -Path $iisAppName -Name "applicationPool" -Value $iisAppPoolName
             Write-Host "`nWEBSITE HAS BEEN SET UP FOR $clientUpperCase" -ForegroundColor Green
+            Set-SslBindingForSite -siteName $iisAppName -hostName $iisAppNameBinding -thumbprint $thumbprint
         }
          
         #Convert to web applications.
@@ -1610,6 +1632,7 @@ Function BindWebsite {
             New-Item $iisAppName -Type Site –PhysicalPath $directoryPath -bindings $binding -Force
             Set-ItemProperty -Path $iisAppName -Name "applicationPool" -Value $iisAppPoolName
             Write-Host "WEBSITE HAS BEEN SET UP FOR $clientUpperCase" -ForegroundColor Green
+            Set-SslBindingForSite -siteName $iisAppName -hostName $iisAppNameBinding -thumbprint $thumbprint
         }
         else {
             Write-Host "`nNO NEW SET UP HAS BEEN MADE FOR $clientUpperCase" -ForegroundColor Yellow
