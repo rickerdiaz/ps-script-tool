@@ -1318,7 +1318,17 @@ Function BindWebsite {
     $iisAppPoolDotNetVersion = "v4.0"
     
     $certificate = "*.calcmenuweb.com*"
-    $thumbprint = $CertificateThumbprint #"92ABF9A806ECC6A7B744AF96060E7D2848F23E91" #(Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object {$_.Subject -like "*$certificate*"}).Thumbprint
+    $thumbprint = $CertificateThumbprint
+    $thumbprint = $thumbprint -replace '\s',''
+    if (-not (Test-Path "Cert:\LocalMachine\My\$thumbprint")) {
+        $matchedCert = Get-ChildItem -Path Cert:\LocalMachine\My |
+            Where-Object { $_.HasPrivateKey -and $_.Subject -like "*$certificate*" } |
+            Sort-Object NotAfter -Descending |
+            Select-Object -First 1
+        if ($matchedCert) {
+            $thumbprint = $matchedCert.Thumbprint
+        }
+    }
     
     #foreach($client in $clientAll) {
 
