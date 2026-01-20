@@ -1820,7 +1820,7 @@ if (($DoApp -eq "1") -or ($DoIIS -eq "1") -or ($DOSql1 -eq "1") -or ($DOUpdate -
     If ($ProfileNameAWS -eq "") 
     {
         Write-Host "Cannot find the AWS credentials" -ForegroundColor DarkYellow
-        $ProfileNameAWS="egs.sandro"
+        $ProfileNameAWS="egs.s31"
         Write-Host "Trying with following AWS credentials: $ProfileNameAWS" -ForegroundColor yellow 
         #Break
     }
