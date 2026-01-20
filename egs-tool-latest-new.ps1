@@ -1260,6 +1260,7 @@ Function New-R53ResourceRecordSet
         $CreateRecord.ResourceRecordSet.Name = "$RecordName.$ZoneName"
         $CreateRecord.ResourceRecordSet.Type = $Type
         $CreateRecord.ResourceRecordSet.TTL = $TTL
+        $CreateRecord.ResourceRecordSet.ResourceRecords = New-Object 'System.Collections.Generic.List[Amazon.Route53.Model.ResourceRecord]'
         $resourceRecord = New-Object Amazon.Route53.Model.ResourceRecord
         $resourceRecord.Value = "$Value"
         $CreateRecord.ResourceRecordSet.ResourceRecords.Add($resourceRecord)
@@ -1295,6 +1296,7 @@ Function Update-R53ResourceRecordSet
         $CreateRecord.ResourceRecordSet.Name = "$RecordName.$ZoneName"
         $CreateRecord.ResourceRecordSet.Type = $Type
         $CreateRecord.ResourceRecordSet.TTL = $TTL
+        $CreateRecord.ResourceRecordSet.ResourceRecords = New-Object 'System.Collections.Generic.List[Amazon.Route53.Model.ResourceRecord]'
         $resourceRecord = New-Object Amazon.Route53.Model.ResourceRecord
         $resourceRecord.Value = "$Value"
         $CreateRecord.ResourceRecordSet.ResourceRecords.Add($resourceRecord)
